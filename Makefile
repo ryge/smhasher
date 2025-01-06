@@ -6,8 +6,8 @@ CFLAGS=-g -O2
 
 objs = $(patsubst %.c,%.o,$(wildcard src/*.c)) $(patsubst %.cpp,%.o,$(wildcard src/*.cpp))
 
-smasher : $(objs)
-	cc $(CFLAGS)  -arch arm64 -o smasher $(objs) -I $(incdir) -lstdc++ -v
+smhasher : $(objs)
+	cc $(CFLAGS)  -arch arm64 -o smhasher $(objs) -I $(incdir) -lstdc++ -v
 	#-stdlib=libstdc++
 
 obj/%.o : src/%.c
