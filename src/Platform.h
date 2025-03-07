@@ -81,9 +81,12 @@ __inline__ unsigned long long int rdtsc()
     __asm__ volatile ("rdtsc" : "=A" (x));
     return x;
 #elif defined(__aarch64__) 
-    unsigned long long int x;
-    __asm__ volatile("mrs %0, cntvct_el0" : "=r" (x));
-    return x;
+    uint64_t cntvct;
+    __asm__ volatile("mrs %0, cntvct_el0" : "=r" (cntvct) :: "memory");
+    return cntvct;
+    // asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(cntvct));
+    // return cntvct << 6;
+
 #else
 #define NO_CYCLE_COUNTER
     return 0;
