@@ -3,6 +3,8 @@
 #include "Platform.h"
 #include "Random.h"
 
+#include <cstdint>
+#include <cstdio>
 #include <map>
 #include <set>
 
@@ -70,6 +72,8 @@ bool VerificationTest ( pfHash hash, const int hashbits, uint32_t expected, bool
 // Hashing the same key twice should always produce the same result.
 
 // The memory alignment of the key should not affect the hash result.
+#define ERROR_BITS_SIZE 2048
+#define DEBUG 0
 
 bool SanityTest ( pfHash hash, const int hashbits )
 {
@@ -77,7 +81,8 @@ bool SanityTest ( pfHash hash, const int hashbits )
   
   Rand r(883741);
 
-  bool result = true;
+  int result = 0;
+  uint8_t error_bits[ERROR_BITS_SIZE]; for(int i=0;i<ERROR_BITS_SIZE;i++) error_bits[i]=0;
 
   const int hashbytes = hashbits/8;
   const int reps = 10;
@@ -90,6 +95,8 @@ bool SanityTest ( pfHash hash, const int hashbits )
 
   uint8_t * hash1 = new uint8_t[hashbytes];
   uint8_t * hash2 = new uint8_t[hashbytes];
+
+  // printf("buflen: %d\n", buflen);
 
   //----------
   
@@ -120,7 +127,11 @@ bool SanityTest ( pfHash hash, const int hashbits )
 
           if(memcmp(hash1,hash2,hashbytes) == 0)
           {
-            result = false;
+            result |= 1;
+            error_bits[bit]=1;
+            if(DEBUG) printf("1");
+          } else {
+            if(DEBUG) printf("0");
           }
 
           // Flip it back, hash again -> we should get the original result.
@@ -130,16 +141,20 @@ bool SanityTest ( pfHash hash, const int hashbits )
 
           if(memcmp(hash1,hash2,hashbytes) != 0)
           {
-            result = false;
+            result |= 2;
           }
         }
+        if(DEBUG) printf("\n");
       }
     }
   }
 
-  if(result == false)
+  if(result != 0)
   {
     printf("*********FAIL*********\n");
+    printf(" Error code %d\n  ", result);
+    for(int i=0;i<ERROR_BITS_SIZE;i++) printf("%d", error_bits[i]);
+    printf("\n");
   }
   else
   {

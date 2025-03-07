@@ -5,6 +5,7 @@
 #include "AvalancheTest.h"
 #include "DifferentialTest.h"
 #include "PMurHash.h"
+#include "rygehash.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -80,6 +81,11 @@ HashInfo g_hashes[] =
   { MurmurHash3_x64_128, 128, 0x6384BA69, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
 
   { PMurHash32_test,      32, 0xB0F57EE3, "PMurHash32",  "Shane Day's portable-ized MurmurHash3 for x86, 32-bit." },
+
+  // Ryge Hash
+  { rshash64_test,      64, 0x6DA55FAB, "rshash64",  "String hash, 64 bit" },
+  { rbhash64_test,      64, 0xA9DDA7D0, "rbhash64",  "Block hash, 64 bit" },
+  { rwhash64_test,      64, 0x492A4397, "rwhash64",  "Window hash, 64 bit" },
 };
 
 HashInfo * findHash ( const char * name )
@@ -517,6 +523,11 @@ void testHash ( const char * name )
   if(pInfo == NULL)
   {
     printf("Invalid hash '%s' specified\n",name);
+    printf("Valid hashes :\n" );
+    for(size_t i = 0; i < sizeof(g_hashes) / sizeof(HashInfo); i++)
+    {
+      printf(" %s (%s)\n", g_hashes[i].name, g_hashes[i].desc);
+    }
     return;
   }
   else
@@ -550,6 +561,8 @@ void testHash ( const char * name )
 int main ( int argc, char ** argv )
 {
   const char * hashToTest = "murmur3a";
+
+  printf("\nRunning on %s architecture.\n", getArch());
 
   if(argc < 2)
   {
